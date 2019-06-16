@@ -35,4 +35,9 @@ public:
 	CStatic m_picture;
 	CButton m_fileOpen;
 	afx_msg void OnBnClickedFileOpen();
+	void ResizeGraphView(CStatic&, int, int);
+	void ReDraw();
+	int nWidth;
+	int nHeight;
+	CString strFileName;
 };

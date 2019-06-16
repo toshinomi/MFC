@@ -146,6 +146,8 @@ void CImageViewDlg::OnPaint()
 	else
 	{
 		CDialogEx::OnPaint();
+		ResizeGraphView(m_picture, nWidth, nHeight);
+		//OnBnClickedFileOpen();
 	}
 }
 
@@ -166,21 +168,70 @@ void CImageViewDlg::OnBnClickedFileOpen()
 	if (fileDlg.DoModal() == IDOK)
 	{
 		CDC* pDC = m_picture.GetDC();
-		CString strFilePass;
-		int nWidth = 0;
-		int nHeight = 0;
-		strFilePass = fileDlg.GetPathName();
+		strFileName = fileDlg.GetPathName();
 
 		CImage* image = new CImage();
-		image->Load(strFilePass);
+		image->Load(strFileName);
 
 		nWidth = image->GetWidth();
 		nHeight = image->GetHeight();
 
-		image->Draw(*pDC, 0, 0, nWidth, nHeight, 0, 0, nWidth*2, nHeight*2);
+		image->Draw(*pDC, 0, 0, nWidth, nHeight, 0, 0, nWidth, nHeight);
 
 		UpdateData(FALSE);
 	}
+
+	return;
+}
+
+
+void CImageViewDlg::ResizeGraphView(CStatic& _picture, int _nWidth, int _nHeight)
+{
+	CRect rect;
+
+	_picture.GetClientRect(&rect);
+
+	int nWInc = _nWidth - rect.Width();
+	int nHInc = _nHeight - rect.Height();
+
+	CRect rectThis;
+	GetWindowRect(&rectThis);
+	if (nWInc > 0)
+	{
+		rectThis.right += nWInc;
+	}
+	if (nHInc > 0)
+	{
+		rectThis.bottom += nHInc;
+	}
+
+	CRect rectViewWnd;
+	_picture.GetWindowRect(&rectViewWnd);
+	ScreenToClient(&rectViewWnd);
+	rectViewWnd.right += nWInc;
+	rectViewWnd.bottom += nHInc;
+
+	MoveWindow(&rectThis);
+	_picture.MoveWindow(&rectViewWnd);
+
+	ReDraw();
+
+	return;
+}
+
+void CImageViewDlg::ReDraw()
+{
+	CDC* pDC = m_picture.GetDC();
+
+	CImage* image = new CImage();
+	image->Load(strFileName);
+
+	nWidth = image->GetWidth();
+	nHeight = image->GetHeight();
+
+	image->Draw(*pDC, 0, 0, nWidth, nHeight, 0, 0, nWidth, nHeight);
+
+	UpdateData(FALSE);
 
 	return;
 }
